@@ -58,6 +58,13 @@
 - **CVE 스캔 게이트 상시화**: Dependabot/Renovate 자동 PR.
 - 의존성 핀 버전은 출발점일 뿐, **스캔이 "현재 시점 CVE 없음"을 보증**한다.
 
+### ⚠️ 의존성 잠금 — 의도적 보류 (결정 B, 2026-06-23)
+- 현재 `ci/scan.sh`의 `trivy fs`는 **`gradle.lockfile`이 없어 사실상 placeholder**(의존성 목록을 못 읽어 거의 검사 안 함). **아직 진짜 CVE 게이트가 아님.**
+- **결정**: 도메인/DDL 작업으로 의존성이 늘어나는 변동기 동안에는 잠금을 **보류**(lockfile churn 회피). 의존성이 안정되면 잠근다.
+- **잠금 트리거**: #1 도메인 모델 + 주요 라이브러리(검증/보안 등) 추가가 끝나 의존성 세트가 안정되는 시점.
+- **잠금 방법**: `build.gradle`에 `dependencyLocking { lockAllConfigurations() }` → `./gradlew dependencies --write-locks` → `gradle.lockfile` 커밋.
+- **그동안의 진짜 게이트**: 앱 진입점 생긴 뒤의 **이미지 스캔**(`trivy image`, `ci/build-image.sh`).
+
 ---
 
 ## 핵심 불변 원칙 (잊지 말 것)

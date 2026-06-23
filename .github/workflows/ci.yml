@@ -30,8 +30,8 @@ jobs:
       - name: Test
         run: ./ci/test.sh                    # 게이트 ① — Bamboo와 동일 스크립트
 
-      - name: Install Trivy
-        uses: aquasecurity/setup-trivy@v0.2.0
+      - name: Install Trivy                  # 액션 버전 의존 회피 — 공식 설치 스크립트
+        run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 
       - name: CVE scan
         run: ./ci/scan.sh                    # 게이트 ③ — Bamboo와 동일 스크립트

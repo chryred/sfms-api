@@ -1,0 +1,29 @@
+// SFMS API 서버 — 빌드 설정 (DESIGN.md §8 보안 버전 스펙 반영)
+// ⚠️ Boot 4의 Gradle 플러그인 구체 구성은 start.spring.io(Spring Initializr)로 한 번 교차검증 권장.
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.7'           // §8.2 경로 B (보안 지원 ~2026-12)
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.sfms'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    // §8.3 Java 21 LTS (ojdbc11 테스트 범위 + 장기 보안 패치)
+    toolchain { languageVersion = JavaLanguageVersion.of(21) }
+}
+
+repositories { mavenCentral() }
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'              // Spring MVC
+    // §8.2 경로 B: Boot 4.0 공식 지원 조합. Boot/BOM 미관리 의존성만 명시 핀.
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:4.0.1'
+    runtimeOnly    'com.oracle.database.jdbc:ojdbc11:23.26.2.0.0'                   // §8.1 Oracle 19c
+    // Jackson/Logback/Tomcat 등은 §8.1대로 버전 명시하지 않고 Boot BOM에 위임.
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test { useJUnitPlatform() }

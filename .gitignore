@@ -1,0 +1,27 @@
+# --- Build output ---
+build/
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar   # Wrapper jar은 커밋해야 다른 PC에서 재현됨
+
+# --- IDE ---
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+bin/
+
+# --- OS ---
+.DS_Store
+
+# --- Logs ---
+*.log
+
+# --- Secrets / 로컬 환경설정 (절대 커밋 금지) ---
+# DB 접속정보·NLS_LANG 등 민감정보는 아래 파일/패턴으로 분리하고 커밋하지 않는다.
+.env
+*-local.yml
+*-local.properties
+application-local.*
+src/main/resources/application-secret.*

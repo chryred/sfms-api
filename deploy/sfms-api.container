@@ -1,0 +1,42 @@
+# SFMS API — Podman Quadlet 유닛 (systemd 제너레이터가 .service로 변환)
+#
+# 설치(최초 1회):
+#   rootful  → sudo cp deploy/sfms-api.container /etc/containers/systemd/
+#   rootless → cp deploy/sfms-api.container ~/.config/containers/systemd/
+#              (+ loginctl enable-linger <유저>  # 부팅 자동기동)
+#   이후 sudo systemctl daemon-reload  ← 이 행위가 Quadlet "적용"
+#        sudo systemctl start sfms-api
+#
+# ⚠️ systemctl enable 은 생성 유닛이라 안 먹힘 → 부팅기동은 아래 [Install] 이 처리.
+
+[Unit]
+Description=SFMS API
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+# 레지스트리 없이 podman load 한 로컬 이미지를 가리킴.
+# deploy/load-and-restart.sh 가 새 이미지를 :current 로 태깅하므로 이 줄은 고정.
+Image=localhost/sfms-api:current
+Pull=never                       # ★ 레지스트리 없음 → pull 시도 차단(필수)
+
+PublishPort=8080:8080
+
+# 한글/시간/인코딩
+Environment=TZ=Asia/Seoul
+Environment=JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
+
+# DB 접속 — 값은 운영 환경에 맞게. 비밀번호는 평문 금지(아래 Secret 사용).
+Environment=NLS_LANG=AMERICAN_AMERICA.US7ASCII   # ⚠️ 게이트 ①에서 확정한 값으로 교체
+Environment=SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//DB_HOST:1521/SVC
+Environment=SPRING_DATASOURCE_USERNAME=sfms
+
+# 비밀번호: 사전에 `podman secret create sfms-db-password -` 로 등록 후 env로 주입
+Secret=sfms-db-password,type=env,target=SPRING_DATASOURCE_PASSWORD
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=120              # Spring Boot 기동 여유
+
+[Install]
+WantedBy=multi-user.target       # 부팅 자동기동 (rootless면 default.target)

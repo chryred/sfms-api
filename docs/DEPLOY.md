@@ -35,17 +35,20 @@ podman build -t sfms-api:0.0.1 .
 
 ## 3. 실행 — 런타임 옵션
 
-### (A) Podman + systemd (권장, 온프렘)
+### (A) Podman + systemd Quadlet (권장, 온프렘) ⭐
+레지스트리 없이 **CD 빌드 → tar 반입 → 서버 기동**까지 템플릿화되어 있다: **[`deploy/`](../deploy/README.md)**
+- `deploy/sfms-api.container` — Quadlet 유닛(`Pull=never`)
+- `deploy/load-and-restart.sh` — tar 적재 → `:current` 태깅 → daemon-reload → restart
+
 ```bash
-podman run -d --name sfms-api -p 8080:8080 \
-  -e SPRING_DATASOURCE_URL="jdbc:oracle:thin:@//DB_HOST:1521/SVC" \
-  -e SPRING_DATASOURCE_USERNAME="sfms" \
-  -e SPRING_DATASOURCE_PASSWORD="$DB_PW" \
-  -e NLS_LANG="<게이트 ①에서 확정한 값>" \
-  sfms-api:0.0.1
-# systemd 등록 (Quadlet 또는):
-podman generate systemd --new --name sfms-api > ~/.config/systemd/user/sfms-api.service
+# 최초 1회
+sudo cp deploy/sfms-api.container /etc/containers/systemd/
+podman secret create sfms-db-password -
+sudo systemctl daemon-reload && sudo systemctl start sfms-api
+# 이후 배포
+./deploy/load-and-restart.sh sfms-api-0.0.2.tar
 ```
+> Quadlet은 systemd 제너레이터라 `.service`를 직접 쓰지 않는다. `.container`를 경로에 두고 `daemon-reload` 하면 적용. 부팅기동은 `[Install]`(※ `systemctl enable` 아님).
 
 ### (B) Docker
 위 `podman` → `docker`로 치환. 동일.

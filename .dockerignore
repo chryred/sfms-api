@@ -1,0 +1,12 @@
+# 빌드 컨텍스트에서 제외 (이미지 경량화 + 빌드 캐시 안정)
+.git
+.gradle
+build
+.idea
+*.iml
+.vscode
+docs
+*.md
+.env
+*-local.*
+application-local.*

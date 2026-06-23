@@ -123,3 +123,4 @@ gradle wrapper
 
 - [`docs/DESIGN.md`](docs/DESIGN.md) — 아키텍처·인코딩 해킹·보안 버전 스펙 전체
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — 게이트 현황 및 향후 진행 사항
+- [`docs/DEPLOY.md`](docs/DEPLOY.md) — Linux 배포 / 컨테이너 / CI/CD 가이드

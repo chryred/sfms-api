@@ -1,0 +1,49 @@
+---
+# SFMS API — Bamboo Specs (YAML, version 2)
+# ⚠️ 사내 Bamboo 버전/에이전트에 맞게 검증·조정 필요:
+#    - project-key / plan key 는 사내 프로젝트 규칙대로
+#    - 에이전트 capability: JDK 21, (스캔)trivy, (이미지)docker/podman 필요
+#    - Bamboo가 이 Specs를 인식하려면 Linked Repository에서 "Scan for Bamboo Specs" 활성화
+#  대안: Specs 문법이 까다로우면 Bamboo UI에서 플랜을 만들고 task로 ci/*.sh 만 호출해도 동일 결과.
+version: 2
+
+plan:
+  project-key: SFMS
+  key: API
+  name: SFMS API - CI
+
+stages:
+  - Test and Scan:
+      jobs:
+        - Test and Scan
+
+Test and Scan:
+  key: TS
+  # JDK 21 + trivy 가능한 에이전트. (Docker 기반 에이전트를 쓴다면 아래 docker 사용)
+  # docker:
+  #   image: eclipse-temurin:21-jdk
+  tasks:
+    - checkout:
+        force-clean-build: false
+    - script:
+        interpreter: SHELL
+        scripts:
+          - chmod +x ci/*.sh gradlew
+          - ./ci/test.sh        # 게이트 ① 단위 테스트
+          - ./ci/scan.sh        # 게이트 ③ CVE (High/Critical 차단)
+  # 산출물/리포트 수집은 사내 규칙대로 artifacts: 로 추가
+
+# ──────────────────────────────────────────────────────────────
+# 이미지 빌드/푸시 스테이지 — @SpringBootApplication 진입점 생기고
+# Docker/Podman 가능 에이전트 확보 후 추가.
+# stages:
+#   - Image:
+#       jobs: [ Image ]
+# Image:
+#   key: IMG
+#   tasks:
+#     - script:
+#         scripts:
+#           - IMAGE="registry.사내/sfms-api:${bamboo.buildNumber}" ./ci/build-image.sh
+# ──────────────────────────────────────────────────────────────
+...

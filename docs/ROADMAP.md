@@ -26,7 +26,7 @@
 2. **`application.yml`** — DataSource(URL/계정), `mybatis.*`, 로깅. 비밀정보는 환경변수/시크릿으로.
 3. **Gradle Wrapper** — `gradle wrapper`로 `gradlew` 고정(빌드 재현성).
 4. **`@RestControllerAdvice`** 표준 에러 응답 포맷, Actuator 헬스체크.
-5. (배포) systemd 유닛 또는 컨테이너 이미지 + `-Dfile.encoding=UTF-8`.
+5. (배포) 컨테이너 이미지(OCI) 빌드 → 레지스트리 → Podman+systemd/k8s. 상세 [`DEPLOY.md`](DEPLOY.md), CI는 `.github/workflows/ci.yml`. ⚠️ 이미지 빌드는 진입점(#1·#2) 생긴 뒤 활성화.
 
 ---
 

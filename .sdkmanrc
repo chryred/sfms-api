@@ -1,0 +1,4 @@
+# SFMS API — SDKMAN 프로젝트 버전 고정 (DESIGN §8)
+# 이 디렉터리 진입 시 `sdk env`(또는 auto_env 활성화 시 자동)로 아래 버전이 적용됨.
+java=21.0.11-tem
+gradle=9.6.0
